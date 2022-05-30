@@ -73,7 +73,11 @@ class PcapFormatter(Formatter):
         self.out.flush()
 
     def write_packet(self, packet : PacketData):
-        data_len = len(packet.data.split(" ")) + 15
+        split_data = packet.data.split(" ")
+        if split_data[-1] == "":
+            split_data = split_data[:-1]
+        data_len = len(split_data) + 15
+        print(f'data: {packet.data}, dataLen: {data_len}, last char in string: {packet.data[-1]}...')
         data_no_spaces = packet.data.replace(" ", '')
         data_bytes = bytes.fromhex(data_no_spaces)
         now = datetime.datetime.now()
@@ -130,7 +134,7 @@ def extract_params(dataStr: str):
     rssi_idx = dataStr.find("rssi")
     rssi_idx_end = dataStr[rssi_idx:].find(',')
     rssi = int(re.findall(r'\d+', dataStr[rssi_idx: rssi_idx_end + rssi_idx])[0])
-    # print(f"freq: {freq} sf: {sf} bandwidth: {bandwidth} snr: {snr} rssi: {rssi}")
+    print(f"freq: {freq} sf: {sf} bandwidth: {bandwidth} snr: {snr} rssi: {rssi}")
     return freq, sf, bandwidth, snr, rssi
 
 def wrap_raw_data(hexData, rawPacketData):
@@ -143,10 +147,10 @@ def main():
     pipe = "/tmp/sharkfin"
     os.system("wireshark -k -i /tmp/sharkfin &")
     out = PcapFormatter(open_fifo(pipe))
-    
-    out.write_header()
+
     # need to write argument parser for port
     port = serial.Serial("/dev/tty.usbserial-0001", baudrate=115200)
+    out.write_header()
     dataLine = ""
     hexData = ""
     packetData = ""
@@ -155,8 +159,8 @@ def main():
         if "rxPkt:: CRC" in currLine:
             dataLine = str(port.readline())
             startIdx = dataLine.find(")")
-            hexData = re.sub('[^a-zA-Z0-9 \n\.]', '', dataLine[startIdx + 3:].strip(" "))
-            hexData = hexData.replace("rn", "")
+            hexData = re.sub('[^a-zA-Z0-9 \n\.]', '', dataLine[startIdx + 3:].strip())
+            hexData = hexData.replace("rn", "").strip()
 
         if not hexData: 
             continue
@@ -165,7 +169,7 @@ def main():
             currLine = str(port.readline())
 
         rawPacketData = currLine
-        # print(f"Found hexData : {hexData} \nFound packetData = {rawPacketData}")
+        print(f"Found hexData : {hexData} \nFound packetData = {rawPacketData}")
         cur_packet = wrap_raw_data(hexData, rawPacketData)
         out.write_packet(cur_packet)
             
