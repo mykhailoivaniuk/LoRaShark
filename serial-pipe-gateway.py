@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 
-# AVR / Arduino dynamic memory log analyis script.
-#
-# Copyright 2014 Matthijs Kooijman <matthijs@stdin.nl>
-#
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
@@ -134,7 +130,7 @@ def extract_params(dataStr: str):
     rssi_idx = dataStr.find("rssi")
     rssi_idx_end = dataStr[rssi_idx:].find(',')
     rssi = int(re.findall(r'\d+', dataStr[rssi_idx: rssi_idx_end + rssi_idx])[0])
-    print(f"freq: {freq} sf: {sf} bandwidth: {bandwidth} snr: {snr} rssi: {rssi}")
+    # print(f"freq: {freq} sf: {sf} bandwidth: {bandwidth} snr: {snr} rssi: {rssi}")
     return freq, sf, bandwidth, snr, rssi
 
 def wrap_raw_data(hexData, rawPacketData):
@@ -153,7 +149,6 @@ def main():
     out.write_header()
     dataLine = ""
     hexData = ""
-    packetData = ""
     while True:
         currLine = str(port.readline())
         if "rxPkt:: CRC" in currLine:
@@ -162,16 +157,16 @@ def main():
             hexData = re.sub('[^a-zA-Z0-9 \n\.]', '', dataLine[startIdx + 3:].strip())
             hexData = hexData.replace("rn", "").strip()
 
-        if not hexData: 
-            continue
-        
-        while '[{"chan"' not in currLine and hexData != "":
-            currLine = str(port.readline())
+            if not hexData: 
+                continue
+            
+            while '[{"chan"' not in currLine and hexData != "":
+                currLine = str(port.readline())
 
-        rawPacketData = currLine
-        print(f"Found hexData : {hexData} \nFound packetData = {rawPacketData}")
-        cur_packet = wrap_raw_data(hexData, rawPacketData)
-        out.write_packet(cur_packet)
+            rawPacketData = currLine
+            # print(f"Found hexData : {hexData} \nFound packetData = {rawPacketData}")
+            cur_packet = wrap_raw_data(hexData, rawPacketData)
+            out.write_packet(cur_packet)
             
 
         

@@ -38,7 +38,7 @@ void loop() {
     Serial.print("'\n");
     // print RSSI of packet
     Serial.printf("RSSI %d\n", LoRa.packetRssi());
-    Serial.printf("SNR %d\n", LoRa.packetSnr());
+    Serial.printf("SNR %f\n", LoRa.packetSnr());
     Serial.printf("Bandwidth %d\n", BW);
     Serial.printf("Frequency %d\n", BAND);
     Serial.printf("Spreading Factor %d\n", SF);
