@@ -13,7 +13,7 @@
 #define BAND    903900000  //you can set band here directly,e.g. 868E6,915E6
 #define SYNCWORD 0x34
 #define SF 7
-#define BW 125E3
+#define BW 125000
 void setup() {
     //WIFI Kit series V1 not support Vext control
   Heltec.begin(true /*DisplayEnable Enable*/, true /*Heltec.LoRa Disable*/, true /*Serial Enable*/, true /*PABOOST Enable*/, BAND /*long BAND*/);
