@@ -73,7 +73,7 @@ class PcapFormatter(Formatter):
         if split_data[-1] == "":
             split_data = split_data[:-1]
         data_len = len(split_data) + 15
-        print(f'data: {packet.data}, dataLen: {data_len}, last char in string: {packet.data[-1]}...')
+        # print(f'data: {packet.data}, dataLen: {data_len}, last char in string: {packet.data[-1]}...')
         data_no_spaces = packet.data.replace(" ", '')
         data_bytes = bytes.fromhex(data_no_spaces)
         now = datetime.datetime.now()
@@ -84,12 +84,14 @@ class PcapFormatter(Formatter):
             data_len,        # number of octets of packet saved in file
             data_len,        # actual length of packet
         ))
+        # print(packet.bandwidth // 125000)
+        # print(packet.sf)
         self.out.write(struct.pack(">BBHIBBBBBBB",
                             0,     #lt_version
                             0,     # padding
                             16,    # lt_header size
                             packet.frequency,   # frequency
-                            packet.bandwidth // 125,   # bandwidth
+                            packet.bandwidth // 125000,   # bandwidth
                             packet.sf,     #spreading factor
                             packet.rssi,    #rssi // change later with actual value
                             packet.rssi,    #max rssi // change later with actual value
@@ -114,19 +116,19 @@ def open_fifo(name):
 def extract_params(hexData, rssiLine, snrLine, bwLine, fLine, sfLine):
     hexData = re.search("'(.*)'", hexData).group(1).strip()
     neg = 1
-    if '-' in rssiLine:
-        neg = -1
+    # if '-' in rssiLine:
+    #     neg = -1
     rssi = neg * int(re.sub(r'[^0-9]', '', rssiLine))
     snr  = int(re.sub(r'[^0-9]', '', snrLine.split('.')[0]))
-    bw   = int(re.sub(r'[^0-9]', '', bwLine))
+    bw   = int(re.sub(r'[^0-9]', '', bwLine)) 
     freq = int(re.sub(r'[^0-9]', '', fLine))
-    sf   = int(re.sub(r'[^0-9]', '', sfLine))
-    print("hex data", hexData)
-    print("rssi", rssi)
-    print("snr", snr)
-    print("freq", freq)
-    print("bw", bw)
-    print("sf", sf)
+    sf   = int(float(re.sub(r'[^0-9]', '', sfLine)))
+    # print("hex data", hexData)
+    # print("rssi", rssi)
+    # print("snr", snr)
+    # print("freq", freq)
+    # print("bw", bw)
+    # print("sf", sf)
     return hexData, rssi, snr, bw, freq, sf
 
 def wrap_raw_data(hexData, rssiLine, snrLine, bwLine, fLine, sfLine):
