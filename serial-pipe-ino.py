@@ -118,7 +118,7 @@ def extract_params(hexData, rssiLine, snrLine, bwLine, fLine, sfLine):
     # neg = 1
     # if '-' in rssiLine:
     #     neg = -1
-    rssi = neg * int(re.sub(r'[^0-9]', '', rssiLine))
+    rssi = int(re.sub(r'[^0-9]', '', rssiLine))
     snr  = int(re.sub(r'[^0-9]', '', snrLine.split('.')[0]))
     bw   = int(re.sub(r'[^0-9]', '', bwLine)) 
     freq = int(re.sub(r'[^0-9]', '', fLine))
