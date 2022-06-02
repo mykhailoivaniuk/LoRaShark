@@ -28,18 +28,17 @@ void loop() {
   int packetSize = LoRa.parsePacket();
   if (packetSize) {
     // received a packet
-    Serial.print("\nReceived packet '");
+    Serial.print("Received packet '");
     // read packet
     while (LoRa.available()) {
       byte b = LoRa.read();
       if (b < 16) {Serial.print("0");}
       Serial.printf("%x ",b);
     }
+    Serial.print("'\n");
     // print RSSI of packet
-    Serial.print("'\nRSSI ");
-    Serial.println(LoRa.packetRssi());
-    Serial.print("SNR ");
-    Serial.println(LoRa.packetSnr());
+    Serial.printf("RSSI %d\n", LoRa.packetRssi());
+    Serial.printf("SNR %d\n", LoRa.packetSnr());
     Serial.printf("Bandwidth %d\n", BW);
     Serial.printf("Frequency %d\n", BAND);
     Serial.printf("Spreading Factor %d\n", SF);
