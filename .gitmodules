@@ -1,0 +1,3 @@
+[submodule "LoRaShark-LoRaWAN-Gateway"]
+	path = LoRaShark-LoRaWAN-Gateway
+	url = https://github.com/chazzhou/LoRaShark-LoRaWAN-Gateway.git
