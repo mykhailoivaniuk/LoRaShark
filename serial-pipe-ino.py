@@ -44,6 +44,7 @@ class PacketData:
     bandwidth : int = 0
     data : str = ""
     sf : int = 0
+    sw : int = 0x34
 
 class Formatter:
     def __init__(self, out):
@@ -97,7 +98,7 @@ class PcapFormatter(Formatter):
                             packet.rssi,    #max rssi // change later with actual value
                             packet.rssi,    # current_rssi // change later with actual value
                             packet.snr,     # signal to noise ratio // change later with actual value
-                            0x34)) #sync word)
+                            packet.sw)) #sync word)
                             
         self.out.write(data_bytes)
         self.out.flush()
@@ -113,7 +114,7 @@ def open_fifo(name):
     # This blocks until the other side of the fifo is opened
     return open(name, 'wb')
 
-def extract_params(hexData, rssiLine, snrLine, bwLine, fLine, sfLine):
+def extract_params(hexData, rssiLine, snrLine, bwLine, fLine, sfLine, swLine):
     hexData = re.search("'(.*)'", hexData).group(1).strip()
     # neg = 1
     # if '-' in rssiLine:
@@ -123,22 +124,24 @@ def extract_params(hexData, rssiLine, snrLine, bwLine, fLine, sfLine):
     bw   = int(re.sub(r'[^0-9]', '', bwLine)) 
     freq = int(re.sub(r'[^0-9]', '', fLine))
     sf   = int(float(re.sub(r'[^0-9]', '', sfLine)))
+    sw   = int(re.sub(r'[^0-9]', '', swLine))
     # print("hex data", hexData)
     # print("rssi", rssi)
     # print("snr", snr)
     # print("freq", freq)
     # print("bw", bw)
     # print("sf", sf)
-    return hexData, rssi, snr, bw, freq, sf
+    return hexData, rssi, snr, bw, freq, sf, sw
 
-def wrap_raw_data(hexData, rssiLine, snrLine, bwLine, fLine, sfLine):
-    hexData, rssi, snr, bw, freq, sf = extract_params(hexData, 
-                                                      rssiLine, 
-                                                      snrLine, 
-                                                      bwLine, 
-                                                      fLine, 
-                                                      sfLine)
-    return PacketData(freq, rssi, snr, bw, hexData, sf)
+def wrap_raw_data(hexData, rssiLine, snrLine, bwLine, fLine, sfLine, swLine):
+    hexData, rssi, snr, bw, freq, sf, sw = extract_params(hexData, 
+                                                          rssiLine, 
+                                                          snrLine, 
+                                                          bwLine, 
+                                                          fLine, 
+                                                          sfLine, 
+                                                          swLine)
+    return PacketData(freq, rssi, snr, bw, hexData, sf, sw)
 
 def main():
     os.system("rm -r /tmp/sharkfin")
@@ -162,7 +165,15 @@ def main():
             bwLine   = str(port.readline())
             fLine    = str(port.readline())
             sfLine   = str(port.readline())
-            cur_packet = wrap_raw_data(hexData, rssiLine, snrLine, bwLine, fLine, sfLine)
+            swLine       = str(port.readline())
+            
+            cur_packet = wrap_raw_data(hexData, 
+                                       rssiLine, 
+                                       snrLine, 
+                                       bwLine, 
+                                       fLine, 
+                                       sfLine, 
+                                       swLine)
             out.write_packet(cur_packet)
         
 

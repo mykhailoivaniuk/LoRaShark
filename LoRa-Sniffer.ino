@@ -42,6 +42,7 @@ void loop() {
     Serial.printf("Bandwidth %d\n", BW);
     Serial.printf("Frequency %d\n", BAND);
     Serial.printf("Spreading Factor %d\n", SF);
+    Serial.printf("Sync Word %d\n", SYNCWORD);
   }
   
 }
