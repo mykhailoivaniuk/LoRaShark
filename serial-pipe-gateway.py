@@ -64,7 +64,7 @@ class PcapFormatter(Formatter):
             0,            # GMT to local correction
             0,            # accuracy of timestamps
             256,          # max length of captured packets, in octets
-            270,          # data link type (DLT) - 147
+            270,          # data link type (DLT) - 270 for LoRaTap
         ))
         self.out.flush()
 
@@ -144,7 +144,7 @@ def main():
     os.system("wireshark -k -i /tmp/sharkfin &")
     out = PcapFormatter(open_fifo(pipe))
 
-    # need to write argument parser for port
+    # change to correct port
     port = serial.Serial("/dev/tty.usbserial-0001", baudrate=115200)
     out.write_header()
     dataLine = ""
