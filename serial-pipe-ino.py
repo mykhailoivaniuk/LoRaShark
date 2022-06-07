@@ -116,11 +116,16 @@ def open_fifo(name):
 
 def extract_params(hexData, rssiLine, snrLine, bwLine, fLine, sfLine, swLine):
     hexData = re.search("'(.*)'", hexData).group(1).strip()
-    # neg = 1
-    # if '-' in rssiLine:
-    #     neg = -1
-    rssi = int(re.sub(r'[^0-9]', '', rssiLine))
+
     snr  = int(re.sub(r'[^0-9]', '', snrLine.split('.')[0]))
+    
+    neg = 1
+    if '-' in rssiLine:
+        neg = -1
+    
+    rssi = neg * int(re.sub(r'[^0-9]', '', rssiLine)) + 139
+    if snr < 0:
+        rssi *= 4
     bw   = int(re.sub(r'[^0-9]', '', bwLine)) 
     freq = int(re.sub(r'[^0-9]', '', fLine))
     sf   = int(float(re.sub(r'[^0-9]', '', sfLine)))

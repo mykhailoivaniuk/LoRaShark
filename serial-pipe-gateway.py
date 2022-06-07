@@ -129,7 +129,9 @@ def extract_params(dataStr: str):
     
     rssi_idx = dataStr.find("rssi")
     rssi_idx_end = dataStr[rssi_idx:].find(',')
-    rssi = int(re.findall(r'\d+', dataStr[rssi_idx: rssi_idx_end + rssi_idx])[0])
+    rssi = int(re.findall(r'\d+', dataStr[rssi_idx: rssi_idx_end + rssi_idx])[0]) + 139
+    if snr < 0:
+        rssi *= 4
     # print(f"freq: {freq} sf: {sf} bandwidth: {bandwidth} snr: {snr} rssi: {rssi}")
     return freq, sf, bandwidth, snr, rssi
 
