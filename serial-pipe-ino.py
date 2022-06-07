@@ -64,7 +64,7 @@ class PcapFormatter(Formatter):
             4,            # minor version number
             0,            # GMT to local correction
             0,            # accuracy of timestamps
-            255,          # max length of captured packets, in octets
+            256,          # max length of captured packets, in octets
             270,          # data link type (DLT) - 147
         ))
         self.out.flush()
